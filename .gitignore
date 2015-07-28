@@ -1,0 +1,14 @@
+*.DS_Store
+*.pyc
+*.egg-info
+.pydevproject
+.pydevproject.bak
+*.proj
+*~
+.idea
+IPython_crash_report.txt
+wsgi.log
+
+/setenv.sh
+braintest/settings/smtp_local_settings.py
+braintest/settings/local_server.py

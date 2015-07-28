@@ -1,0 +1,5 @@
+-r base.txt
+ipython==3.2.1
+ipdb==0.8.1
+#sqlparse
+PdbSublimeTextSupport==0.2
