@@ -1,0 +1,5 @@
+server_setup:
+    locale: en_US.UTF-8
+
+system_packages:
+    - unzip

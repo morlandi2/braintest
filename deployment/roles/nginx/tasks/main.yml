@@ -1,0 +1,23 @@
+---
+
+- name: Ensure required packages are installed
+  action: apt pkg={{item}} state=installed
+  with_items:
+    - build-essential
+    - nginx
+
+- name: Install nginx config file
+  template: src=nginx.conf
+            dest=/etc/nginx/nginx.conf
+            owner=root
+            group=root
+  notify:
+    - restart nginx
+
+- name: remove default nginx site
+  file: >
+    path=/etc/nginx/sites-enabled/default
+    state=absent
+  notify:
+    - restart nginx
+

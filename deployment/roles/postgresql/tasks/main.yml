@@ -1,0 +1,8 @@
+---
+
+- include: repository.yml
+- include: postgresql.yml
+- include: geos.yml
+  when: postgresql.enablepostgis
+- include: postgis.yml
+  when: postgresql.enablepostgis

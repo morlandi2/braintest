@@ -1,0 +1,7 @@
+- name: Copy retrieve_remote_data script
+  template:
+      src=retrieve_remote_data.sh
+      dest=/home/{{user.username}}/scripts/retrieve_remote_data.sh
+      mode=0744
+      owner={{user.username}}
+      group={{user.usergroup}}

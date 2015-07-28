@@ -1,0 +1,17 @@
+---
+
+- name: Ensure required packages are installed
+  action: apt pkg={{item}} state=installed
+  sudo_user: root
+  with_items:
+    - supervisor
+    - python-requests
+
+- name: Install supervisor configuration file
+  template: >
+    src=supervisor.conf
+    dest=/etc/supervisor/conf.d/{{django.project}}.conf
+  sudo_user: root
+  notify:
+    - add supervised services
+    - restart supervised services

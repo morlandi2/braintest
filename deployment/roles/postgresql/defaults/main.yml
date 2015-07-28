@@ -1,0 +1,22 @@
+postgresql:
+  locale: en_US.UTF-8
+  version: 9.3
+  repo: 'deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main'
+  install_development_headers: true
+  enablepostgis: False
+  user: postgres
+  group: postgres
+  config:
+    shared_buffers: 24MB  # default: 128MB
+    work_mem: 1MB  # default: 1MB
+    checkpoint_segments: 3  # default: 3
+    checkpoint_completion_target: 0.5  # deafult: 0.5
+    effective_cache_size: 128MB  # default: 128MB
+
+geos:
+  version: 3.3.9
+  userhome: /var/lib/postgresql
+
+postgis:
+  version: 2.0.6
+  userhome: /var/lib/postgresql

@@ -1,0 +1,117 @@
+---
+
+- name: Ensure required packages are installed
+  action: apt pkg={{item}} state=installed
+  sudo_user: root
+  with_items:
+    - python-dev
+    - git
+    #- python-virtualenv
+    - python-setuptools
+    - python-psycopg2
+    - supervisor
+    - libldap2-dev
+    - libsasl2-dev
+    - python-ldap
+    - libxml2-dev
+    - libxslt1-dev
+
+# - name: Install packages required by Pygame
+#   action: apt pkg={{item}} state=installed
+#   sudo_user: root
+#   with_items:
+#     - mercurial
+#     - python-pygame
+#     - libsdl1.2-dev
+#     - libsdl-image1.2-dev
+#     - libsdl-mixer1.2-dev
+#     - libsdl-ttf2.0-dev
+
+- name: Pull sources from the repository.
+  git: >
+      repo={{django.repo}}
+      dest={{django.root}}/{{django.project}}/
+      version={{django.branch}}
+      accept_hostkey=True
+  notify:
+      - restart all frontend services
+  tags: django_pull
+
+- name: Check default settings file presence
+  action: stat
+  args:
+    path: "{{django.settings_file}}"
+  register: default_settings_file
+
+# - name: Create default settings file
+#   template: >
+#       src=../{{django.project}}/settings/production.py
+#       dest={{django.settings_file}}
+#       owner={{user.username}}
+#       group={{user.usergroup}}
+#   when: not default_settings_file.stat.exists
+
+- name: Create "local" settings file
+  template: >
+      src=local_settings.py
+      dest={{django.settings_file}}
+  when: not default_settings_file.stat.exists
+
+- name: Create "setenv" script
+  template: >
+      src=setenv.sh
+      dest={{django.root}}
+
+- name: Install Postgresql development header files
+  apt: pkg={{ item }} state=installed
+  when: postgresql.install_development_headers == true
+  with_items:
+    - libpq-dev
+  sudo_user: root
+
+- name: Upgrade the virtualenv.
+  pip: >
+      virtualenv={{django.virtualenv}}
+      requirements={{django.root}}/{{django.project}}/requirements/production.txt
+
+- name: Run django management commands
+  django_manage: >
+      command={{item}}
+      app_path={{django.root}}/{{django.project}}
+      settings={{django.settings}}
+      virtualenv={{django.virtualenv}}
+      pythonpath={{django.pythonpath}}
+  with_items:
+    - syncdb
+    - migrate
+    - collectstatic
+
+- name: Install nginx configuration file
+  template: >
+    src=nginx.conf
+    dest=/etc/nginx/sites-available/{{django.project}}.conf
+  sudo_user: root
+  notify:
+    - restart all frontend services
+
+- name: Enable nginx configuration file
+  file: >
+      src=/etc/nginx/sites-available/{{django.project}}.conf
+      dest=/etc/nginx/sites-enabled/{{django.project}}.conf
+      owner=root
+      group=root
+      state=link
+  sudo_user: root
+  notify:
+    - restart all frontend services
+
+- name: Create Gunicorn configuration file
+  template: >
+      src=gunicorn.conf.py
+      dest={{django.website_home}}
+
+- name: Create Gunicorn start script
+  template: >
+      src=start_gunicorn.sh
+      mode=0744
+      dest={{django.website_home}}

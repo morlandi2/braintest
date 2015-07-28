@@ -1,0 +1,13 @@
+- name: Ensure required packages are installed
+  action: apt pkg={{item}} state=installed update-cache=yes
+  with_items:
+    - redis-server
+
+- name: Install redis config file
+  template: src=redis.conf
+            dest=/etc/redis/redis.conf
+            owner=root
+            group=root
+  notify:
+    - restart redis
+

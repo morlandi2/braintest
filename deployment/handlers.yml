@@ -1,0 +1,46 @@
+---
+- name: restart postgresql
+  service: name=postgresql state=restarted
+
+- name: restart nginx
+  service: name=nginx state=restarted
+  sudo_user: root
+
+- name: reload nginx
+  service: name=nginx state=reloaded
+  sudo_user: root
+
+- name: restart gunicorn
+  sudo_user: root
+  supervisorctl: name={{item}} state=restarted
+  with_items:
+    - "{{django.project}}-gunicorn"
+
+- name: restart all frontend services
+  service: name={{item}} state=restarted
+  sudo_user: root
+  with_items:
+    - nginx
+  notify:
+    - restart gunicorn
+    - restart supervised services
+
+- name: add supervised services
+
+  supervisorctl: name={{item}} state=present
+  with_items:
+    - "{{ django.project }}-gunicorn"
+    #- "{{ django.project }}-celery"
+    #- "{{ django.project }}-flower"
+    #- "{{ django.project }}-celerybeat"
+  notify:
+    - restart supervised services
+
+- name: restart supervised services
+
+  supervisorctl: name={{item}} state=restarted
+  with_items:
+    - "{{ django.project }}-gunicorn"
+    #- "{{ django.project }}-celery"
+    #- "{{ django.project }}-flower"
+    #- "{{ django.project }}-celerybeat"

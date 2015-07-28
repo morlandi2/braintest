@@ -1,0 +1,37 @@
+---
+# adapted from:
+# http://python-thoughts.blogspot.it/2012/11/install-postgis-with-ansible.html
+
+- name: ensure packages are installed
+  action: apt pkg={{item}} state=installed
+  with_items:
+    - postgresql-server-dev-{{ postgresql.version }}
+    - build-essential
+    - libxml2-dev
+    - proj
+    - libjson0-dev
+    - xsltproc
+    - docbook-xsl
+    - docbook-mathml
+    - libgdal1-dev
+
+- name: create download dir
+  action: file dest={{ geos.userhome }}/download state=directory
+
+- name: download GEOS
+  action: get_url url=http://download.osgeo.org/geos/geos-{{ geos.version }}.tar.bz2
+                  dest={{ geos.userhome }}/download/geos-{{ geos.version }}.tar.bz2 mode=0440
+
+- name: untar GEOS
+  action: command tar xjf geos-{{ geos.version }}.tar.bz2 chdir={{ geos.userhome }}/download/ creates=geos-{{ geos.version }}
+
+- name: configure GEOS
+  action: command ./configure chdir={{ geos.userhome }}/download/geos-{{ geos.version }}
+
+- name: make GEOS
+  action: command make chdir={{ geos.userhome }}/download/geos-{{ geos.version }}
+  sudo: True
+
+- name: install GEOS
+  sudo: True
+  action: command make install chdir={{ geos.userhome }}/download/geos-{{ geos.version }}
