@@ -1,0 +1,26 @@
+---
+
+- name: Install Postgresql server and client
+  apt: pkg={{ item }}-{{ postgresql.version }} state=installed
+  register: postgresql_install
+  with_items:
+    - postgresql
+
+# - name: recreate postgresql cluster with utf8 encoding
+#   shell: pg_dropcluster --stop {{ postgresql.version }} main && pg_createcluster --locale {{ postgresql.locale }} --start {{ postgresql.version }} main
+#   sudo_user: root
+#   when: postgresql_install.changed
+
+# # This might be needed later on to compile psycopg2
+# - name: Install development header files
+#   apt: pkg={{ item }} state=installed
+#   when: postgresql.install_development_headers == true
+#   with_items:
+#     - libpq-dev
+
+- name: Install PostgreSQL config file
+  template: src=postgresql-{{ postgresql.version }}.conf
+            dest=/etc/postgresql/{{ postgresql.version }}/main/postgresql.conf
+            owner={{ postgresql.user }} group={{ postgresql.group }}
+  notify:
+    - restart postgresql

@@ -1,0 +1,50 @@
+---
+production:
+    # this is as source for 'retrieve_remote_data.sh' script
+    hostname: test.brainstorm.it
+
+server_setup:
+    locale: en_US.UTF-8
+
+system_packages:
+    - unzip
+    - git
+    - libfreetype6-dev
+    - libjpeg8-dev
+
+user:
+    username: 'braintest'
+    usergroup: 'braintest'
+
+database:
+    db_password: '3d1db7b3c8f7'
+    db_user: 'braintest'
+    db_name: 'braintest'
+    db_encoding: 'UTF-8'
+    db_enablepostgis: False
+
+django:
+    branch: master
+    socket: 127.0.0.1:3059
+    socketfile: /home/braintest/run/gunicorn.sock
+    project: braintest
+    owner: braintest
+    root: /home/braintest
+    logto: /home/braintest/logs
+    website_home: /home/braintest/braintest
+    static_root: /home/braintest/public/static
+    media_root: /home/braintest/public/media
+    virtualenv: /home/braintest/python
+    pythonpath: /home/braintest/python/bin
+    settings_file: /home/braintest/braintest/braintest/settings/local.py
+    settings: braintest.settings.local
+    repo: git@github.com:morlandi/braintest.git
+    use_gunicorn: True
+
+flower:
+    user: webmaster
+    password: 6e325512ac07d3a9
+    port: 5554
+    broker: 'redis://localhost:6379/0'
+
+

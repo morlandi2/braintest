@@ -1,0 +1,42 @@
+---
+# adapted from:
+# http://python-thoughts.blogspot.it/2012/11/install-postgis-with-ansible.html
+
+- name: ensure packages are installed
+  action: apt pkg={{item}} state=installed
+  with_items:
+    - postgresql-server-dev-{{ postgresql.version }}
+    - build-essential
+    - libxml2-dev
+    - proj
+    - libjson0-dev
+    - xsltproc
+    - docbook-xsl
+    - docbook-mathml
+    - libgdal1-dev
+
+- name: create download dir
+  action: file dest={{ postgis.userhome }}/download state=directory
+
+- name: download PostGis
+  action: get_url url=http://download.osgeo.org/postgis/source/postgis-{{ postgis.version }}.tar.gz
+                  dest={{ postgis.userhome }}/download/postgis-{{ postgis.version }}.tar.gz mode=0440
+
+- name: untar PostGis
+  action: command tar xzf postgis-{{ postgis.version }}.tar.gz chdir={{ postgis.userhome }}/download/ creates=postgis-{{ postgis.version }}/
+
+- name: make PostGis
+  action: command make chdir={{ postgis.userhome }}/download/postgis-{{ postgis.version }}
+  sudo: True
+
+- name: install PostGis
+  action: command make install chdir={{ postgis.userhome }}/download/postgis-{{ postgis.version }}
+  sudo: True
+
+- name: install PostGis
+  action: command make comments-install chdir={{ postgis.userhome }}/download/postgis-{{ postgis.version }}
+  sudo: True
+
+- name: post install ldconfig
+  action: command ldconfig
+  sudo: True

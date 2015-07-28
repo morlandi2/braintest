@@ -1,0 +1,9 @@
+#bind = "{{django.socket}}"
+bind = "unix:{{django.socketfile}}"
+workers = 4
+max_requests = 100
+max_request_jitter = 10
+preload = True
+#loglevel = 'INFO'
+#accesslog = '{{ django.logto }}/gunicorn_access.log'
+errorlog = '{{ django.logto }}/gunicorn_error.log'

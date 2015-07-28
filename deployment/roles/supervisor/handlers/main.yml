@@ -1,0 +1,31 @@
+---
+#
+# NOTE
+#
+# When state = present,
+#     the module will call supervisorctl reread then supervisorctl add
+#     if the program/group does not exist.
+#
+# When state = restarted,
+#     the module will call supervisorctl update then call supervisorctl restart.
+#
+
+- name: add supervised services
+
+  supervisorctl: name={{item}} state=present
+  with_items:
+    - "{{ django.project }}-gunicorn"
+    - "{{ django.project }}-celery"
+    #- "{{ django.project }}-flower"
+    #- "{{ django.project }}-celerybeat"
+  notify:
+    - restart supervised services
+
+- name: restart supervised services
+
+  supervisorctl: name={{item}} state=restarted
+  with_items:
+    - "{{ django.project }}-gunicorn"
+    - "{{ django.project }}-celery"
+    #- "{{ django.project }}-flower"
+    #- "{{ django.project }}-celerybeat"

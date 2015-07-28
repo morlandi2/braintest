@@ -1,0 +1,11 @@
+---
+# - name: Update apt cache
+#   action: apt update_cache=yes
+
+- name: Update apt cache
+  sudo: True
+  action: command apt-get update
+
+- name: Install required packages.
+  action: apt pkg={{item}} state=installed
+  with_items: system_packages

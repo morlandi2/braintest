@@ -1,0 +1,10 @@
+---
+- name: Install locale
+  template: src=locale
+            dest=/etc/default/locale
+            owner=root
+            group=root
+
+- name: Set locale
+  action: locale_gen name={{server_setup.locale}} state=present
+

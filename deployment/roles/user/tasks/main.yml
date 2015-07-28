@@ -1,0 +1,43 @@
+---
+# Creating a user
+
+- name: Add group
+  sudo: true
+  action: group name={{user.usergroup}}
+
+- name: Add user
+  sudo: true
+  user: >
+    name={{user.username}}
+    group={{user.usergroup}}
+    home=/home/{{user.username}}/
+    shell=/bin/bash
+    generate_ssh_key=yes
+    state=present
+#  password={{user.password}}
+
+- name: Create standard folders
+  file: >
+    path={{item}}
+    state=directory
+    owner={{user.username}}
+    group={{user.usergroup}}
+  with_items:
+    - /home/{{user.username}}/logs
+    - /home/{{user.username}}/dumps
+    - /home/{{user.username}}/run
+    - /home/{{user.username}}/scripts
+    - /home/{{user.username}}/public
+    - /home/{{user.username}}/public/static
+    - /home/{{user.username}}/public/media
+
+- name: Adds SSH authorized key for user
+  authorized_key: >
+    user={{user.username}}
+    key="{{ lookup('file','~/.ssh/id_rsa.pub') }}"
+    state=present
+
+- name: Replicate host ~/.gitconfig
+  copy: >
+    src=~/.gitconfig
+    dest=/home/{{user.username}}/.gitconfig
