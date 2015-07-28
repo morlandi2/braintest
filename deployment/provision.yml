@@ -19,7 +19,7 @@
     - { role: database, tags: ['database', ] }
     - { role: utils, tags: ['utils', ] }
     - { role: django, sudo: yes, sudo_user: "{{django.owner}}", tags: ['django', ] }
-    # - { role: supervisor, tags: ['supervisor', ] }
+    - { role: supervisor, tags: ['supervisor', ] }
 
   vars_files:
     - vars.yml

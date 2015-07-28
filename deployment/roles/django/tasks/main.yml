@@ -43,12 +43,18 @@
     path: "{{django.settings_file}}"
   register: default_settings_file
 
-- name: Create default settings file
+# - name: Create default settings file
+#   template: >
+#       src=../{{django.project}}/settings/production.py
+#       dest={{django.settings_file}}
+#       owner={{user.username}}
+#       group={{user.usergroup}}
+#   when: not default_settings_file.stat.exists
+
+- name: Create "local" settings file
   template: >
-      src=../{{django.project}}/settings/production.py
+      src=local_settings.py
       dest={{django.settings_file}}
-      owner={{user.username}}
-      group={{user.usergroup}}
   when: not default_settings_file.stat.exists
 
 - name: Create "setenv" script

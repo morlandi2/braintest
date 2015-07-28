@@ -24,3 +24,23 @@
   notify:
     - restart gunicorn
     - restart supervised services
+
+- name: add supervised services
+
+  supervisorctl: name={{item}} state=present
+  with_items:
+    - "{{ django.project }}-gunicorn"
+    #- "{{ django.project }}-celery"
+    #- "{{ django.project }}-flower"
+    #- "{{ django.project }}-celerybeat"
+  notify:
+    - restart supervised services
+
+- name: restart supervised services
+
+  supervisorctl: name={{item}} state=restarted
+  with_items:
+    - "{{ django.project }}-gunicorn"
+    #- "{{ django.project }}-celery"
+    #- "{{ django.project }}-flower"
+    #- "{{ django.project }}-celerybeat"
